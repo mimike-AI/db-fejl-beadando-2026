@@ -25,3 +25,21 @@ class Person:
             return NotImplemented
 
         return self.id < o.id
+
+
+@dataclass
+class HealthProfile:
+    person_id: str
+    blood_type: str
+    height_cm: float
+    weight_kg: float
+    bmi: float
+
+
+@dataclass
+class Diagnosis:
+    id: str
+    person_id: str
+    disease: str
+    icd10: str
+    specialty: str
