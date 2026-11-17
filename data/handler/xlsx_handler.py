@@ -1,6 +1,6 @@
 import openpyxl
 
-from data.model_dataclasses import Person, Sex, HealthProfile, Diagnosis
+from data.model_dataclasses import Person, Sex, HealthProfile, Diagnosis, GalacticProfile
 
 def write_people(people: list[Person],
                  workbook: openpyxl.Workbook,
@@ -125,3 +125,53 @@ def read_diagnoses(workbook: openpyxl.Workbook,
         row += 1
         diagnoses.append(diagnosis)
     return diagnoses
+
+
+def write_galactic_profiles(profiles: list[GalacticProfile],
+                            workbook: openpyxl.Workbook,
+                            sheet_name: str = "galactic_profiles",
+                            heading: bool = True) -> None:
+    sheet = workbook.create_sheet(sheet_name)
+
+    if heading:
+        field_names = ["person_id", "scifi_name", "rank", "starship",
+                       "starship_registry", "starship_class", "location",
+                       "language"]
+        for col in range(len(field_names)):
+            sheet.cell(row=1, column=col + 1, value=field_names[col])
+
+    offset = 2 if heading else 1
+    for row in range(len(profiles)):
+        sheet.cell(row=row + offset, column=1, value=profiles[row].person_id)
+        sheet.cell(row=row + offset, column=2, value=profiles[row].scifi_name)
+        sheet.cell(row=row + offset, column=3, value=profiles[row].rank)
+        sheet.cell(row=row + offset, column=4, value=profiles[row].starship)
+        sheet.cell(row=row + offset, column=5, value=profiles[row].starship_registry)
+        sheet.cell(row=row + offset, column=6, value=profiles[row].starship_class)
+        sheet.cell(row=row + offset, column=7, value=profiles[row].location)
+        sheet.cell(row=row + offset, column=8, value=profiles[row].language)
+
+
+def read_galactic_profiles(workbook: openpyxl.Workbook,
+                           sheet_name: str = "galactic_profiles",
+                           heading: bool = True) -> list[GalacticProfile]:
+    sheet = workbook[sheet_name]
+
+    profiles = []
+    row = 2 if heading else 1
+    while True:
+        if sheet.cell(row=row, column=1).value is None:
+            break
+        profile = GalacticProfile(
+            sheet.cell(row=row, column=1).value,
+            sheet.cell(row=row, column=2).value,
+            sheet.cell(row=row, column=3).value,
+            sheet.cell(row=row, column=4).value,
+            sheet.cell(row=row, column=5).value,
+            sheet.cell(row=row, column=6).value,
+            sheet.cell(row=row, column=7).value,
+            sheet.cell(row=row, column=8).value
+        )
+        row += 1
+        profiles.append(profile)
+    return profiles

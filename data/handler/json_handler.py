@@ -1,7 +1,7 @@
 import json
 import os
 
-from data.model_dataclasses import Person, Sex, HealthProfile, Diagnosis
+from data.model_dataclasses import Person, Sex, HealthProfile, Diagnosis, GalacticProfile
 
 def write_people(people: list[Person],
                  path: str,
@@ -78,3 +78,31 @@ def read_diagnoses(path: str,
                                   obj["specialty"])
             diagnoses.append(diagnosis)
         return diagnoses
+
+
+def write_galactic_profiles(profiles: list[GalacticProfile],
+                            path: str,
+                            file_name: str = "galactic_profiles",
+                            extension: str = ".json",
+                            pretty: bool = True) -> None:
+    with open(os.path.join(path, file_name + extension), "w",
+              encoding="utf-8") as file:
+        json.dump([profile.__dict__ for profile in profiles], file,
+                  indent=2 if pretty else None, ensure_ascii=False)
+
+
+def read_galactic_profiles(path: str,
+                           file_name: str = "galactic_profiles",
+                           extension: str = ".json") -> list[GalacticProfile]:
+    with open(os.path.join(path, file_name + extension),
+              encoding="utf-8") as file:
+        profiles = []
+        objects = json.load(file)
+        for obj in objects:
+            profile = GalacticProfile(obj["person_id"], obj["scifi_name"],
+                                      obj["rank"], obj["starship"],
+                                      obj["starship_registry"],
+                                      obj["starship_class"], obj["location"],
+                                      obj["language"])
+            profiles.append(profile)
+        return profiles

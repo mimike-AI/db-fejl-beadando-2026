@@ -1,7 +1,8 @@
 from faker import Faker
 from faker_healthcare import HealthcareProvider
+from faker_galactic import SciFiProvider
 from data.model_dataclasses import Person, Sex
-from data.model_dataclasses import HealthProfile, Diagnosis
+from data.model_dataclasses import HealthProfile, Diagnosis, GalacticProfile
 import random
 
 
@@ -66,3 +67,30 @@ def generate_health_data(people: list[Person],
                 scenario["medical_specialty"]))
 
     return profiles, diagnoses
+
+
+def generate_galactic_profiles(people: list[Person]) -> list[GalacticProfile]:
+
+    fake = Faker()
+    fake.add_provider(SciFiProvider)
+
+    profiles = []
+    for person in people:
+        if person.sex is Sex.MALE:
+            scifi_name = (f"{fake.scifi_first_name_male()} "
+                          f"{fake.scifi_last_name_male()}")
+        else:
+            scifi_name = (f"{fake.scifi_first_name_female()} "
+                          f"{fake.scifi_last_name_female()}")
+
+        profiles.append(GalacticProfile(
+            person.id,
+            scifi_name,
+            fake.scifi_rank(),
+            fake.starship(),
+            fake.starship_registry(),
+            fake.starship_class(),
+            fake.scifi_location(),
+            fake.scifi_language()))
+
+    return profiles

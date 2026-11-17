@@ -43,3 +43,15 @@ class Diagnosis:
     disease: str
     icd10: str
     specialty: str
+
+
+@dataclass
+class GalacticProfile:
+    person_id: str
+    scifi_name: str
+    rank: str
+    starship: str
+    starship_registry: str
+    starship_class: str
+    location: str
+    language: str
