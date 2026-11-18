@@ -19,7 +19,6 @@ def generate_people(n: int, male_ratio: float = 0.5,
 
     people = []
     fake = Faker(locale)
-    # Faker.seed(0)
     fake = fake if not unique else fake.unique
     for i in range(n):
         sex = Sex.MALE if random.random() < male_ratio else Sex.FEMALE

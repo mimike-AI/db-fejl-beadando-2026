@@ -106,3 +106,69 @@ def read_galactic_profiles(path: str,
                                       obj["language"])
             profiles.append(profile)
         return profiles
+
+
+def write_characters(people: list[Person],
+                     health_profiles: list[HealthProfile],
+                     diagnoses: list[Diagnosis],
+                     galactic_profiles: list[GalacticProfile],
+                     path: str,
+                     file_name: str = "characters",
+                     extension: str = ".json",
+                     pretty: bool = True) -> None:
+    health_by_person = {h.person_id: h for h in health_profiles}
+    galactic_by_person = {g.person_id: g for g in galactic_profiles}
+    diagnoses_by_person = {}
+    for d in diagnoses:
+        diagnoses_by_person.setdefault(d.person_id, []).append(d)
+
+    characters = []
+    for person in people:
+        characters.append({
+            "person": person.__dict__,
+            "galactic_profile": galactic_by_person[person.id].__dict__,
+            "health_profile": health_by_person[person.id].__dict__,
+            "diagnoses": [d.__dict__
+                          for d in diagnoses_by_person.get(person.id, [])]
+        })
+
+    with open(os.path.join(path, file_name + extension), "w",
+              encoding="utf-8") as file:
+        json.dump(characters, file,
+                  indent=2 if pretty else None, ensure_ascii=False)
+
+
+def read_characters(path: str,
+                    file_name: str = "characters",
+                    extension: str = ".json"
+                    ) -> tuple[list[Person], list[HealthProfile],
+                               list[Diagnosis], list[GalacticProfile]]:
+    with open(os.path.join(path, file_name + extension),
+              encoding="utf-8") as file:
+        characters = json.load(file)
+
+    people = []
+    health_profiles = []
+    diagnoses = []
+    galactic_profiles = []
+    for character in characters:
+        p = character["person"]
+        people.append(Person(p["id"], p["name"], p["age"], Sex(p["sex"])))
+
+        g = character["galactic_profile"]
+        galactic_profiles.append(GalacticProfile(
+            g["person_id"], g["scifi_name"], g["rank"], g["starship"],
+            g["starship_registry"], g["starship_class"], g["location"],
+            g["language"]))
+
+        h = character["health_profile"]
+        health_profiles.append(HealthProfile(
+            h["person_id"], h["blood_type"], h["height_cm"],
+            h["weight_kg"], h["bmi"]))
+
+        for d in character["diagnoses"]:
+            diagnoses.append(Diagnosis(
+                d["id"], d["person_id"], d["disease"], d["icd10"],
+                d["specialty"]))
+
+    return people, health_profiles, diagnoses, galactic_profiles
